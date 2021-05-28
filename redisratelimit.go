@@ -43,3 +43,18 @@ func (rrl *RedisRateLimit) CheckRateLimit(key string, limit int64, isincr bool, 
 	durationTTL = rrl.rdb.TTL(rrl.ctx, key).Val()
 	return true, limit - val, durationTTL
 }
+
+func (rrl *RedisRateLimit) ReSetRoundRobin(key string) {
+	rrl.rdb.Del(rrl.ctx, key)
+}
+
+func (rrl *RedisRateLimit) SetRoundRobin(key string, val string) {
+	rrl.rdb.LPush(rrl.ctx, key, val)
+}
+
+func (rrl *RedisRateLimit) GetRoundRobin(key string) string {
+	if rrl.rdb.LLen(rrl.ctx, key).Val() == 0 {
+		return ""
+	}
+	return rrl.rdb.BRPopLPush(rrl.ctx, key, key, time.Second).Val()
+}

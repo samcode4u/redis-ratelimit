@@ -7,6 +7,45 @@ import (
 
 // https://www.programmersought.com/article/7162782496/
 
+func TestGetRoundRobin(t *testing.T) {
+	rrl := new(RedisRateLimit)
+
+	rrl.InitClient()
+
+	t.Log("EMPTY")
+	rrl.ReSetRoundRobin("RRKEY")
+	for i := 0; i < 10; i++ {
+		t.Log(rrl.GetRoundRobin("RRKEY"))
+	}
+
+	t.Log("ONE")
+	rrl.ReSetRoundRobin("RRKEY")
+	rrl.SetRoundRobin("RRKEY", "node1")
+	for i := 0; i < 10; i++ {
+		t.Log(rrl.GetRoundRobin("RRKEY"))
+	}
+
+	t.Log("TWO")
+	rrl.ReSetRoundRobin("RRKEY")
+	rrl.SetRoundRobin("RRKEY", "node1")
+	rrl.SetRoundRobin("RRKEY", "node2")
+	for i := 0; i < 10; i++ {
+		t.Log(rrl.GetRoundRobin("RRKEY"))
+	}
+
+	t.Log("SIX")
+	rrl.ReSetRoundRobin("RRKEY")
+	rrl.SetRoundRobin("RRKEY", "node1")
+	rrl.SetRoundRobin("RRKEY", "node2")
+	rrl.SetRoundRobin("RRKEY", "node3")
+	rrl.SetRoundRobin("RRKEY", "node4")
+	rrl.SetRoundRobin("RRKEY", "node5")
+	rrl.SetRoundRobin("RRKEY", "node6")
+	for i := 0; i < 10; i++ {
+		t.Log(rrl.GetRoundRobin("RRKEY"))
+	}
+}
+
 func TestCheckRateLimit(t *testing.T) {
 
 	rrl := new(RedisRateLimit)
